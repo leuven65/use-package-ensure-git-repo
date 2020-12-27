@@ -1,0 +1,55 @@
+# -*- coding: utf-8; org-download-method: directory; org-download-image-dir: "./image"; -*-
+#+TITLE: use-package-ensure-git-repo
+#+AUTHOR: Jian Wang
+#+DATE: 2020-12-26
+
+* About
+"use-package-ensure-git-repo" is an extension for the Emacs package "use-package"
+[[https://github.com/jwiegley/use-package]].
+
+It add new keyword "~:ensure-git-repo~" to "use-package", to support to install elisp package from
+git repository.
+
+* Installation
+Clone this git repo to "${user-emacs-directory}/packages/use-package-ensure-git-repo", and add folowing lines to
+your Emacs config file:
+#+begin_src emacs-lisp
+  (use-package use-package-ensure-git-repo
+    :defer t
+    :ensure nil ; it is github package
+    ;; If the path is relative, it is expanded within `user-emacs-directory'
+    :load-path "packages/use-package-ensure-git-repo"
+    :custom
+    ;; (use-package-ensure-git-repo-always-update nil)
+    :init
+    (let ((pkg-name "use-package-ensure-git-repo"))
+      (ignore-errors
+        (package-generate-autoloads pkg-name
+                                    (expand-file-name (concat "packages/" pkg-name)
+                                                      user-emacs-directory)))
+      (load (concat pkg-name "-autoloads.el")))
+    )
+#+end_src
+
+* Usage
+** Use the keyword "~:ensure-git-repo~" in ~use-package~ to specify which git repo is used for installation
+Such as, if to install Emacs package "fd-dired" from GitHub repo
+[[https://github.com/leuven65/fd-dired]], it can be configured as:
+#+begin_src emacs-lisp
+  (use-package fd-dired
+    :ensure-git-repo "https://github.com/leuven65/fd-dired"
+    )
+#+end_src
+
+It will:
+1. clone the git repo for the 1st time, or pull from the remote git repo. \\
+   The local directory is "~${user-emacs-directory}/packages/${package-name}~"
+2. generate "~*-autoloads.el~" file.
+3. byte compile all the "~.el~" file.
+4. Add "~${user-emacs-directory}/packages/${package-name}~" to ~load-path~.
+5. load the autoload file "~*-autoloads.el~".
+
+** Variable "~use-package-ensure-git-repo-always-update~"
+By default, "~use-package-ensure-git-repo-always-update~" is "t", so that "~:ensure-git-repo~" will
+pull from the remote git repo and update local git repo.
+You can set to "nil" to disable updating.
