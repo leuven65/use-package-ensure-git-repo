@@ -39,10 +39,9 @@
 
 (defun use-package-ensure-git-repo-update-git-repo (local-dir)
   "git pull"
-  (let* ((dir (use-package-ensure-git-repo-get-package-dir local-dir))
-         (cmd (format "cd '%s' && git pull" dir)))
-    (message "Try to update repo '%s'" dir)
-    (call-process-shell-command cmd)))
+  (let* ((default-directory local-dir))
+    (message "Try to update repo '%s'" default-directory)
+    (call-process-shell-command "git pull")))
 
 (defun use-package-ensure-git-repo-get-package-dir (dir-name)
   (expand-file-name (concat "packages/" dir-name)
